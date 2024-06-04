@@ -1,7 +1,7 @@
 # crud-app---BE
- Back-End desenvolvimento web
-
+Back-End desenvolvimento web
 
 # Integrantes 
- Nome Completo | RA
- Lucas Jeronymo Ribeiro | 210117
+Nome Completo | RA
+
+Lucas Jeronymo Ribeiro | 210117
