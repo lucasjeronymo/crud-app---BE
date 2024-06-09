@@ -138,10 +138,10 @@ app.put('/tasks/:id', authMiddleware, async (req, res) => {
 app.post('/tasks', authMiddleware, async (req, res) => {
   const { title, description } = req.body;
   try {
-    const task = new Task({ 
-      user: req.user.id, 
-      title, 
-      description 
+    const task = new Task({
+      user: req.user.id,
+      title,
+      description
     });
     await task.save();
     res.status(201).json(task);
@@ -161,6 +161,37 @@ app.delete('/tasks/:id', authMiddleware, async (req, res) => {
     res.send('Tarefa deletada com sucesso');
   } catch (error) {
     res.status(400).send(error.message);
+  }
+});
+
+// Rota para listar tarefas sem dono
+app.get('/tasks/unassigned', authMiddleware, async (req, res) => {
+  try {
+      const tasks = await Task.find({ user: null }); // Busca tarefas onde o campo user é nulo
+      res.json(tasks);
+  } catch (error) {
+      res.status(500).send('Erro ao buscar tarefas sem dono');
+  }
+});
+
+// Rota para atribuir um dono a uma tarefa específica
+app.put('/tasks/:id/assign', authMiddleware, async (req, res) => {
+  const taskId = req.params.id;
+  const userId = req.user.id; // ID do usuário logado (obtido do token JWT)
+
+  try {
+      const task = await Task.findById(taskId);
+      if (!task) {
+          return res.status(404).send('Tarefa não encontrada');
+      }
+
+      // Atribui o dono à tarefa
+      task.user = userId;
+      await task.save();
+
+      res.send('Dono atribuído à tarefa com sucesso');
+  } catch (error) {
+      res.status(500).send('Erro ao atribuir dono à tarefa');
   }
 });
 
