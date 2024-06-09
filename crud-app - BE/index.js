@@ -2,9 +2,12 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { randomUUID } = require('crypto');
 const User = require('./models/user');
-const Task = require('./models/task');  // Import Task model
-const authMiddleware = require('./middlewares/auth');
+const Task = require('./models/task'); // Importando o modelo de Task
+const authMiddleware = require('./middlewares/auth'); // Certifique-se de que este arquivo existe e está configurado corretamente
+
+
 
 const app = express();
 app.use(express.json());
@@ -129,6 +132,38 @@ app.put('/tasks/:id', authMiddleware, async (req, res) => {
     res.status(500).send('Erro no servidor');
   }
 });
+
+
+// Rota para criar uma nova tarefa
+app.post('/tasks', authMiddleware, async (req, res) => {
+  const { title, description } = req.body;
+  try {
+    const task = new Task({ 
+      user: req.user.id, 
+      title, 
+      description 
+    });
+    await task.save();
+    res.status(201).json(task);
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
+
+// Rota para excluir uma tarefa específica do usuário logado
+app.delete('/tasks/:id', authMiddleware, async (req, res) => {
+  const taskId = req.params.id;
+  try {
+    const task = await Task.findOneAndDelete({ _id: taskId, user: req.user.id });
+    if (!task) {
+      return res.status(404).send('Tarefa não encontrada');
+    }
+    res.send('Tarefa deletada com sucesso');
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
