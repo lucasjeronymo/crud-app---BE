@@ -3,13 +3,13 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { randomUUID } = require('crypto');
-const User = require('./models/User');
+const User = require('./models/user');
 const authMiddleware = require('./middlewares/auth');
 
 const app = express();
 app.use(express.json());
 
-const PORT = 8080;
+const PORT = 3000;
 const MONGO_URI = 'mongodb+srv://admin:admin@devweb.wabaiwo.mongodb.net/';
 
 mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
